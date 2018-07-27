@@ -1,0 +1,38 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: TOSCA Yaml of Doodle App by Elena Bucchianeri
+
+repositories:
+  docker_hub: https://registry.hub.docker.com/
+
+imports:
+  - tosker: https://di-unipi-socc.github.io/tosker-types/tosker.yaml
+
+topology_template:
+  node_templates:
+    doodle:
+      type: tosker.nodes.Software
+      artifacts:
+        doodle_code: doodle.zip
+      requirements:
+      - host:
+         node_filter:
+           properties:
+           - ports:
+             - 8080: 8080
+           - supported_sw:
+             - java: 1.8.0
+             - mvn: 3.x
+      interfaces:
+        Standard:
+          create:
+            implementation: scripts/create_doodle.sh
+            inputs:
+              code: {get_artifact: [SELF, doodle_code]}
+          # ADD START, STOP AND DELETE
+          start:
+            implementation: scripts/start_doodle.sh
+          stop:
+            implementation: scripts/stop_doodle.sh
+          delete:
+            implementation: scripts/delete_doodle.sh
